@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import w
 import argparse
 import sys
@@ -49,7 +50,7 @@ if args.d != None:
 
 # g is for "maximum guesses"
 if args.g:
-  max_guesses = args.g
+  max_guesses = abs(args.g)
 else:
   max_guesses = 6
 
