@@ -12,6 +12,7 @@ parser.add_argument('-l',     metavar="solution",            help="look up the d
 parser.add_argument('-d',     metavar="day",       type=int, help="look up the solution of a given day")
 parser.add_argument('-g',     metavar="guesses",   type=int, help="number of guesses")
 parser.add_argument('--hard', action='store_true',           help="enable hard mode")
+# TODO: Implement hard mode properly (more than just a *)
 
 # Parse the args
 args = parser.parse_args()
@@ -48,14 +49,6 @@ if args.g:
   max_guesses = args.g
 else:
   max_guesses = 6
-
-# Get today's day number
-if args.day is not None:
-  # Ahoy-hoy, time traveller!
-  d = args.day
-else:
-  # find num. days since Wordle launch
-  d = (date.today() - date(2021, 6, 19)).days
 
 # Get today's word
 wotd = w.Answers[d]
@@ -107,7 +100,7 @@ def game():
   words = w.Words + w.Answers
   guess = 0
   while guess < max_guesses:
-    ui = input()
+    ui = input().lower()
     if len(ui) == 5 and ui in words:
       g.append(ui)
       wordbox(ui)
