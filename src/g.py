@@ -57,7 +57,7 @@ else:
 if args.word:
   wotd = args.word
   # Indicate a non-standard word
-  d = -1
+  d = args.word
 else:
   if d >= len(w.Answers):
     d = len(w.Answers) - 1
@@ -69,37 +69,31 @@ a = ["⬛", "🟨", "🟩"]
 # Guesses go here
 g = []
 
-# Hits/Misses go here
-h = ""
-m = ""
-
 #        C  R  A  N  E
 hints = [0, 0, 0, 0, 0]
 
 def wordbox(word):
   b = ""
-  global h, m, hints
-  wordlist = list(wotd)
+  global hints
+  wordlist = list(word)
 
   line = [0] * len(word)
   # Green pass
   for i in range(len(word)):
     if word[i] == wotd[i]:
       line[i]  = 2
+      # Mark as hinted (right place)
       hints[i] = 2
       wordlist[i] = 0
-      h += word[i]
 
   # Yellow pass
   for i in range(len(word)):
-    if wordlist[i] and word[i] in wordlist:
+    if wordlist[i] and word[i] in wotd:
       line[i] = 1
       # Mark as hinted (wrong place)
       hints[wordlist.index(word[i])]= 1
       # Remove letter from wordlist
-      wordlist[wordlist.index(word[i])] = 0
-      # Mark the hit
-      h += word[i]
+      wordlist[i] = 0
 
   # Blockify pass
   for i in line:
