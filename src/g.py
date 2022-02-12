@@ -11,7 +11,9 @@ parser.add_argument('day',    nargs="?",           type=int, help="Wordle day nu
 parser.add_argument('-l',     metavar="solution",            help="look up the day of a given solution")
 parser.add_argument('-d',     metavar="day",       type=int, help="look up the solution of a given day")
 parser.add_argument('-g',     metavar="guesses",   type=int, help="number of guesses")
-parser.add_argument('--hard', action='store_true',           help="enable hard mode")
+parser.add_argument('--word', metavar="wotd",                help="force a particular word")
+parser.add_argument('--nonsense', action='store_true',       help="allow nonsensical guesses")
+parser.add_argument('--hard',     action='store_true',       help="enable hard mode (wip)")
 # TODO: Implement hard mode properly (more than just a *)
 
 # Parse the args
@@ -33,7 +35,7 @@ if args.l:
   if l in w.Answers and w.Answers.index(l) < d:
     print ("Wordle {}: {}".format(w.Answers.index(l), l))
   else:
-    print ("{} is not a Wordle (yet)".format(args.l))
+    print ("{} is not a Wordle (yet?)".format(args.l))
   exit(0)
 
 # d is for "Find this day's answer"
@@ -45,13 +47,21 @@ if args.d != None:
     print ("No Solution")
   exit(0)
 
+# g is for "maximum guesses"
 if args.g:
   max_guesses = args.g
 else:
   max_guesses = 6
 
 # Get today's word
-wotd = w.Answers[d]
+if args.word:
+  wotd = args.word
+  # Indicate a non-standard word
+  d = -1
+else:
+  if d >= len(w.Answers):
+    d = len(w.Answers) - 1
+  wotd = w.Answers[d]
 
 # Box characters!
 a = ["⬛", "🟨", "🟩"]
@@ -68,31 +78,31 @@ hints = [0, 0, 0, 0, 0]
 
 def wordbox(word):
   b = ""
-  global h, m
+  global h, m, hints
   wordlist = list(wotd)
+
+  line = [0] * len(word)
+  # Green pass
   for i in range(len(word)):
     if word[i] == wotd[i]:
-      # Mark as hinted (right place)
+      line[i]  = 2
       hints[i] = 2
-      # Remove letter from wordlist
       wordlist[i] = 0
-      # add "🟩" to line
-      b += a[2]
-      # Mark the hit
-      h += word[i]
-    elif word[i] in wordlist:
+
+  # Yellow pass
+  for i in range(len(word)):
+    if word[i] in wordlist:
+      line[i] = 1
       # Mark as hinted (wrong place)
       hints[wordlist.index(word[i])]= 1
       # Remove letter from wordlist
       wordlist[wordlist.index(word[i])] = 0
-      # Add "🟨" to line
-      b += a[1]
       # Mark the hit
       h += word[i]
-    else:
-      # Add "⬛" to line
-      b += a[0]
-      m +=word[i]
+
+  # Blockify pass
+  for i in line:
+    b += a[i]
   print(b)
 
 def game():
@@ -101,7 +111,7 @@ def game():
   guess = 0
   while guess < max_guesses:
     ui = input().lower()
-    if len(ui) == 5 and ui in words:
+    if len(ui) == 5 and (ui in words or args.nonsense):
       g.append(ui)
       wordbox(ui)
       if (ui == wotd):
@@ -119,5 +129,5 @@ def win(won):
   print("\nWordle {} {}/{}{}\n".format(d, len(g) if won else "X", max_guesses, "*" if args.hard else ""))
   for gi in g:
     wordbox(gi)
-
+  print()
 game()
