@@ -88,10 +88,11 @@ def wordbox(word):
       line[i]  = 2
       hints[i] = 2
       wordlist[i] = 0
+      h += word[i]
 
   # Yellow pass
   for i in range(len(word)):
-    if word[i] in wordlist:
+    if wordlist[i] and word[i] in wordlist:
       line[i] = 1
       # Mark as hinted (wrong place)
       hints[wordlist.index(word[i])]= 1
