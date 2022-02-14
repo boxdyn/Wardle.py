@@ -55,50 +55,49 @@ else:
 
 # Get today's word
 if args.word:
-  wotd = args.word
+  solution = args.word
   # Indicate a non-standard word
   d = args.word
+  # If solution not in words list, enable nonsense
+  if solution not in w.Words + w.Answers:
+    args.nonsense = True
 else:
   if d >= len(w.Answers):
     d = len(w.Answers) - 1
-  wotd = w.Answers[d]
+  solution = w.Answers[d]
+# End arg parsing
+
+# ! The game is below this point
 
 # Box characters!
-a = ["⬛", "🟨", "🟩"]
+boxes = ["⬛", "🟨", "🟩"]
 
 # Guesses go here
-g = []
-
-#        C  R  A  N  E
-hints = [0, 0, 0, 0, 0]
+guesses = []
 
 def wordbox(word):
-  b = ""
-  global hints
-  wordlist = list(word)
-
+  output = ""
   line = [0] * len(word)
+  guess = list(word)
+  sol   = list(solution)
   # Green pass
   for i in range(len(word)):
-    if word[i] == wotd[i]:
-      line[i]  = 2
-      # Mark as hinted (right place)
-      hints[i] = 2
-      wordlist[i] = 0
-
+    if guess[i] == sol[i]:
+      # Mark the letter 'green' (2)
+      line[i] = 2
+      # Remove letter from solution and guess
+      sol[i] = guess[i] = 0
   # Yellow pass
   for i in range(len(word)):
-    if wordlist[i] and word[i] in wotd:
+    if guess[i] and word[i] in sol:
+      # Mark the letter 'yellow' (1)
       line[i] = 1
-      # Mark as hinted (wrong place)
-      hints[wordlist.index(word[i])]= 1
-      # Remove letter from wordlist
-      wordlist[i] = 0
-
-  # Blockify pass
+      # Remove letter from solution and guess
+      sol[sol.index(word[i])] = guess[i] = 0
+  # Turn blocks into a string, and print it
   for i in line:
-    b += a[i]
-  print(b)
+    output += boxes[i]
+  print(output)
 
 def game():
   print("[   Wordle {}{}  ]".format(d, "*" if args.hard else " "))
@@ -107,9 +106,9 @@ def game():
   while guess < max_guesses:
     ui = input().lower()
     if len(ui) == 5 and (ui in words or args.nonsense):
-      g.append(ui)
+      guesses.append(ui)
       wordbox(ui)
-      if (ui == wotd):
+      if (ui == solution):
         win(True)
         return
       else:
@@ -121,8 +120,9 @@ def game():
   win(False)
 
 def win(won):
-  print("\nWordle {} {}/{}{}\n".format(d, len(g) if won else "X", max_guesses, "*" if args.hard else ""))
-  for gi in g:
+  print("\nWordle {} {}/{}{}\n".format(d, len(guesses) if won else "X", max_guesses, "*" if args.hard else ""))
+  for gi in guesses:
     wordbox(gi)
   print()
+
 game()
