@@ -1,5 +1,10 @@
 # Warning! Contains spoilers for every wordle answer ever. You have been warned!!!
 
+# This word list contains the official set of Wordle words and solutions, as seen on powerlanguage.co.uk/wordle
+# and has been included here for compatibility with the official Wardle/NYT Wordle client.
+
+# w.py: Wordle non-answers and answers
+
 # These are not answers
 Words = [
     "aahed","aalii","aargh","aarti","abaca","abaci","abacs","abaft","abaka","abamp","aband","abash","abask","abaya","abbas",
