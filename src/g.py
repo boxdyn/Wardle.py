@@ -42,7 +42,7 @@ parser.add_argument('--word', metavar="solution",            help="force a parti
 parser.add_argument('--classic',  action='store_true',       help="use the classic Wordle word list")
 parser.add_argument('--nonsense', action='store_true',       help="allow nonsensical guesses")
 parser.add_argument('--hard',     action='store_true',       help="enable hard mode (wip)")
-parser.add_argument('--clear',    action='store_true',       help="clear screen and reset cursor position on start")
+parser.add_argument('--nocenter', action='store_true',       help="disable centering the screen")
 # TODO: Implement hard mode properly (more than just a *)
 
 # Parse the args
@@ -159,35 +159,32 @@ def keeb(x, y):
    def colorify(string):
       s = ""
       for char in string:
-         s += c.c24(colors[letters[letter_num(char)]]) + char + c.RESET
+         s += c.c24(colors[letters[letter_num(char)]]) + " " + char + " " + c.RESET
       return s
-   S = ["qwertyuiop","asdfghjkl","zxcvbnm"]
-   ui.uprint(x, y,   colorify(" " + S[0] + " "))
-   ui.uprint(x, y+1, colorify("  " + S[1] + " "))
-   ui.uprint(x, y+2, colorify("  " + S[2] + "   "))
+   S = ["qwertyuiop", "asdfghjkl", "zxcvbnm"+u"\u23CE"]
+   for i in range(len(S)):
+      ui.uprint(x-(3*len(S[i])//2)+7, y+i, colorify(S[i]))
 
 
 #   intro: Print the intro text
 def intro():
    title  = "Wordle {}{}".format(d, "*" if args.hard else "")
-   spaces = '  '
-   # spaces = ' ' * ((13 - len(title)) // 2)
-   intro  = c.RESET          # Reset the text printing colors
-   if args.clear:
-      intro += c.clear(False) # Clear the screen
-      intro += ui.m_abs(0,0)   # Move the cursor to 0,0 (top left)
-                                          # [  Wordle 100* ]
-   intro += spaces + title + "\n"
+   spaces = ' ' * ((14 - len(title)) // 2)
+   # [  Wordle 100* ]
+   intro  = c.RESET + spaces + title
    return intro
 
 def game():
-   x = get_terminal_size().columns//2 - 8
+   if args.nocenter:
+      x = ui.size[0]//2 - 8
+   else:
+      x = get_terminal_size().columns//2 - 8
    ui.uprint(x, 0, intro())
    words = w.Words + w.Answers
    guess = 0
    while guess < max_guesses:
       # lol i should probably use curses
-      keeb(x, 10)
+      keeb(x+1, 9)
       user_input = ui.uinput(x, len(guesses) + 2, c.clear() + "     ").lower()
       if len(user_input) == 5 and (user_input in words or args.nonsense):
          # Add guesses to the guessed list, and put the word in boxes
@@ -217,5 +214,5 @@ def win(won):
    print(ui.m(0,ui.size[1]+1) + board)
 
 
-ui.init(15,12)
+ui.init(30,12)
 game()

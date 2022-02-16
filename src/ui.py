@@ -34,7 +34,7 @@ size = [0,0]
 def init(width, height):
    size[0], size[1] = width, height
    print(c.c24(0x00f0d0) + '0123456789ABCDE' + c.RESET)
-   print(("A"*width + "\n")*(height-1))
+   print((" "*width + "\n")*(height-1))
    print(m(0,-height-1) + ANSI_S, end='')
    clear()
 
