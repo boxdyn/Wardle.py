@@ -11,16 +11,16 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 # c.py: ANSI Escape Sequence colors
 
 # 'constants' -- feel free to change at runtime ;P
-RESET = "\033[0m"
+RESET = "\x1b[0m"
 
 def esc(c):
-   return f"\033[{c}m"# + str(c) + "m"
+   return f"\x1b[{c}m"# + str(c) + "m"
 
 
 def clear(line=True):
    if line:
-      return "\033[K"
-   return "\033[2J"
+      return "\x1b[2K"
+   return "\x1b[2J"
 
 # ANSI Colors
 def c(c, bg=0, i=0):

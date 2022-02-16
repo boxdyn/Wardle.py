@@ -12,11 +12,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 import sys
 
-ANSI_S = "\033[s"
-ANSI_U = "\033[u"
+ANSI_S = "\x1b[s"
+ANSI_U = "\x1b[u"
 
-CLEAR  = "\033[2J"
+CLEAR  = "\x1b[2J"
 
+SHOW_CURSOR = "\x1b[12?25h"
+HIDE_CURSOR = "\x1b[8m"
 
 #   directions
 UP    = NORTH = 'A'
@@ -30,12 +32,12 @@ size = [0,0]
 def init(width, height, x=0, y=0):
    size[0], size[1] = width, height
    for i in range(y,y+height):
-      uprint(x,i," "*width)
-   uprint(x,height+y,f"{m(0, -height)}{ANSI_S}")
+      uprint(x,i," "*width + "\n")
+   uprint(x,height+y,f"{m(0, -height)}{ANSI_S}{HIDE_CURSOR}")
    clear()
 
 def clear(x = 0, y = 0, behavior = 0):
-   uprint(x, y, f"\x1b[{behavior}J")
+   uprint(x, y, f"\x1b[{behavior}J{SHOW_CURSOR}\n")
 
 # ANSI Escape Sequence Generators:
 #   unless otherwise specified, return strings containing ANSI escape characters
@@ -50,26 +52,28 @@ def m(x = 0, y = 0):
 #   Move the cursor relatively on the screen in a given direction
 def m_dir(dir, steps=1):
    if ord('A') <= ord(dir) <= ord('D') :
-      return f"\033[{steps}{dir}"
+      return f"\x1b[{steps}{dir}"
    return ""
 
 #  Position the cursor absolutely on the screen (0-index)
 def m_abs(x, y):
-   return f"\033[{y+1};{x+1}H"
+   return f"\x1b[{y+1};{x+1}H"
 
 # print/input wrappers
 #   uprint: call print at a given x,y position, relative to the cursor
 def uprint(x, y, *args, **kwargs):
    print(f"{ANSI_S}{m(x, y)}", end='')
+   sys.stdout.flush()
    print(*args, **kwargs, end='')
-   print(ANSI_U, end='')
+   print(f"{ANSI_U}", end='')
    sys.stdout.flush()
 
 #   uinput: call input at a given x,y position, relative to the cursor
 #     returns: string containing user input
 def uinput(x, y, *args, **kwargs):
-   print(f"{ANSI_S}{m(x, y)}", end='')
+   print(f"{ANSI_S}{SHOW_CURSOR}{SHOW_CURSOR}{SHOW_CURSOR}{SHOW_CURSOR}{m(x, y)}", end='')
+   sys.stdout.flush()
    r = input(*args, **kwargs)
-   print(ANSI_U, end='')
+   print(f"{HIDE_CURSOR}{ANSI_U}", end='')
    sys.stdout.flush()
    return r
