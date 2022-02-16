@@ -46,7 +46,7 @@ parser.add_argument('--clear',    action='store_true',       help="clear screen 
 # TODO: Implement hard mode properly (more than just a *)
 
 # Parse the args
-args = parser.parse_args()\
+args = parser.parse_args()
 
 # Handle the args
 #   Select the correct word list
@@ -68,7 +68,6 @@ if args.l:
    if l in w.Answers and w.Answers.index(l) < d:
       print ("Wordle {}: {}".format(w.Answers.index(l), l))
    else:
-
       print ("{} is not a Wordle (yet?)".format(args.l))
    exit(0)
 #   d is for "Find this day's answer"
@@ -215,7 +214,7 @@ def win(won):
    for gi in guesses:
       board += "\n" + wordbox(gi)
 
-   print(ui.m(0,12) + board)
+   print(ui.m(0,ui.size[1]+1) + board)
 
 
 ui.init(15,12)
