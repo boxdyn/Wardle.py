@@ -10,11 +10,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 # ui.py: ANSI Escape Sequence colors
 
-
-
-from time import sleep
-import sys, re
-import c
+import sys
 
 ANSI_S = "\033[s"
 ANSI_U = "\033[u"
@@ -30,47 +26,50 @@ LEFT  = WEST  = 'D'
 
 size = [0,0]
 
-
-def init(width, height):
+# init: Initialize the "screen" and ensure the appropriate area is on screen and cleared
+def init(width, height, x=0, y=0):
    size[0], size[1] = width, height
-   print(c.c24(0x00f0d0) + '0123456789ABCDE' + c.RESET)
-   print((" "*width + "\n")*(height-1))
-   print(m(0,-height-1) + ANSI_S, end='')
+   for i in range(y,y+height):
+      uprint(x,i," "*width)
+   uprint(x,height+y,f"{m(0, -height)}{ANSI_S}")
    clear()
 
 def clear(x = 0, y = 0, behavior = 0):
-   uprint(x, y, "\x1b[%dJ"%behavior)
+   uprint(x, y, f"\x1b[{behavior}J")
+
+# ANSI Escape Sequence Generators:
+#   unless otherwise specified, return strings containing ANSI escape characters
 
 # Move the cursor relatively on the screen
 def m(x = 0, y = 0):
-   # TODO: implement relative x/y movement
-   s = "{}{}".format(
-       m_dir(UP,   abs(y)) if y < 0 else m_dir(DOWN,  y) if y > 0 else "",
-       m_dir(LEFT, abs(x)) if x < 0 else m_dir(RIGHT, x) if x > 0 else "")
+   # move on the y axis, followed by the x axis
+   s = f"{m_dir(UP,   abs(y)) if y < 0 else m_dir(DOWN,  y) if y > 0 else ''}" + \
+       f"{m_dir(LEFT, abs(x)) if x < 0 else m_dir(RIGHT, x) if x > 0 else ''}"
    return s
 
-#   Move the cursor relatively on the screen
+#   Move the cursor relatively on the screen in a given direction
 def m_dir(dir, steps=1):
    if ord('A') <= ord(dir) <= ord('D') :
-      return "\033[{}{}".format(steps, dir)
+      return f"\033[{steps}{dir}"
    return ""
 
 #  Position the cursor absolutely on the screen (0-index)
 def m_abs(x, y):
-   return "\033[{};{}H".format(y+1, x+1)
+   return f"\033[{y+1};{x+1}H"
 
-ui_input, ui_print = input, print
-
-def uprint(x, y, *args, end='', **kwargs):
-   ui_print(ANSI_S + m(x, y), end='')
-   ui_print(*args, ANSI_U, **kwargs, end='')
-   ui_print(ANSI_U, end=end)
+# print/input wrappers
+#   uprint: call print at a given x,y position, relative to the cursor
+def uprint(x, y, *args, **kwargs):
+   print(f"{ANSI_S}{m(x, y)}", end='')
+   print(*args, **kwargs, end='')
+   print(ANSI_U, end='')
    sys.stdout.flush()
 
-
+#   uinput: call input at a given x,y position, relative to the cursor
+#     returns: string containing user input
 def uinput(x, y, *args, **kwargs):
-   ui_print(ANSI_S + m(x, y), end='')
-   r = ui_input(*args, **kwargs)
-   ui_print(ANSI_U, end='')
+   print(f"{ANSI_S}{m(x, y)}", end='')
+   r = input(*args, **kwargs)
+   print(ANSI_U, end='')
    sys.stdout.flush()
    return r

@@ -4,6 +4,12 @@
 # and has been included here for compatibility with the official Wardle/NYT Wordle client.
 
 # w.py: Wordle non-answers and answers
+Metadata = {
+   "name": "Wordle",
+   "version": "NYT",
+   "guesses": 6,
+   "launch": (2021, 6, 19)
+}
 
 # These are not answers
 Words = [
