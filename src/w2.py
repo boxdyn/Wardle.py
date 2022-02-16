@@ -8,7 +8,7 @@ Metadata = {
    "name": "Wordle",
    "version": "NYT",
    "guesses": 6,
-   "launch": (2021, 6, 19)
+   "launch": (2021, 6, 19),
 }
 
 # These are not answers

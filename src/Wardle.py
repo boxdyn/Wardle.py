@@ -1,3 +1,6 @@
 #!/usr/bin/python3
-# lol
 import game
+
+game.init()
+game.game()
+game.end()
